@@ -25,13 +25,16 @@ function getMorseEvent(event) {
 const signalStart$ = getMorseEvent('start');
 const signalEnd$ = getMorseEvent('end');
 
-const morseSignal$ = signalStart$.pipe(
-    flatMap(start => signalEnd$
-        .pipe(
-            map(end => end.timestamp - start.timestamp),
-            first()
+function getDistanceBetweenActions(firstAction$, secondAction$) {
+    return firstAction$.pipe(
+        flatMap(firstAction => secondAction$
+            .pipe(
+                map(secondAction => secondAction.timestamp - firstAction.timestamp),
+                first()
+            )
         )
-    )
-);
+    );
+}
 
-morseSignal$.subscribe(console.log);
+const signal$ = getDistanceBetweenActions(signalStart$, signalEnd$);
+const whitespace$ = getDistanceBetweenActions(signalEnd$, signalStart$);
