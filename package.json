@@ -6,7 +6,7 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "dev": "webpack --mode development; webpack-dev-server"
+    "dev": "webpack --mode development; webpack-dev-server --mode development"
   },
   "dependencies": {
     "rxjs": "^6.3.3"

@@ -1,13 +1,10 @@
-import {fromEvent, merge} from 'rxjs';
-import {map, distinctUntilChanged, filter, flatMap, timestamp, first} from 'rxjs/operators';
-
-const keyboardEvents = {
-    keydown: 'start',
-    keyup: 'end'
-};
+import {fromEvent, merge, of} from 'rxjs';
+import {map, distinctUntilChanged, filter, flatMap, timestamp, first, delay, buffer, takeUntil} from 'rxjs/operators';
+import {KEYBOARD_EVENTS, SPAN} from './consts';
+import {parseMorseCode} from './alpabet';
 
 function listenKeyboardEvent(event) {
-    return fromEvent(document, event).pipe(map(() => keyboardEvents[event]));
+    return fromEvent(document, event).pipe(map(() => KEYBOARD_EVENTS[event]));
 }
 
 const morseAction$ = merge(
@@ -25,16 +22,48 @@ function getMorseEvent(event) {
 const signalStart$ = getMorseEvent('start');
 const signalEnd$ = getMorseEvent('end');
 
-function getDistanceBetweenActions(firstAction$, secondAction$) {
-    return firstAction$.pipe(
-        flatMap(firstAction => secondAction$
-            .pipe(
-                map(secondAction => secondAction.timestamp - firstAction.timestamp),
-                first()
-            )
+const signal$ = signalStart$
+    .pipe(flatMap(start => signalEnd$
+        .pipe(
+            map(end => end.timestamp - start.timestamp),
+            first(),
+            map(signalLength => signalLength <= SPAN.DOT ? '.' : '-')
         )
-    );
-}
+    ));
 
-const signal$ = getDistanceBetweenActions(signalStart$, signalEnd$);
-const whitespace$ = getDistanceBetweenActions(signalEnd$, signalStart$);
+const whitespace$ = signalEnd$
+    .pipe(flatMap(end => {
+        const timeout = of(SPAN.LETTER).pipe(delay(SPAN.LETTER));
+        const whitespace = signalEnd$.pipe(
+            map(start => start.timestamp - end.timestamp),
+            first()
+        );
+        return merge(whitespace, timeout).pipe(first());
+    }));
+
+const letterWhitespaces$ = whitespace$.pipe(
+    filter(whitespace => whitespace >= SPAN.LETTER && whitespace < SPAN.WORD)
+);
+
+const letter$ = signal$.pipe(
+    buffer(letterWhitespaces$),
+    map(symbols => symbols.join('')),
+    map(parseMorseCode)
+);
+
+const wordWhitespaces$ = letterWhitespaces$
+    .pipe(
+        flatMap(whitespace => {
+            const ms = SPAN.WORD - whitespace;
+            return of(ms).pipe(
+                delay(ms),
+                first(),
+                takeUntil(signalStart$)
+            );
+        })
+    );
+
+const word$ = letter$.pipe(
+    buffer(wordWhitespaces$),
+    map(letters => letters.join(''))
+);
