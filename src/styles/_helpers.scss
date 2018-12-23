@@ -1,0 +1,12 @@
+.width--full {width: 100%}
+
+.no-flex-resizable {
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+
+.flex {display: flex}
+
+// offsets
+
+.padding--lg {padding: 40px}

@@ -1,0 +1,13 @@
+.grid__column {
+  flex-direction: column;
+}
+
+.grid__item--half {
+  flex-grow: 1;
+  flex-basis: 50%;
+  max-width: 50%;
+}
+
+.grid__item--fit {
+  flex-grow: 12;
+}
