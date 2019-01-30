@@ -1,30 +1,27 @@
 export class $el {
     constructor(target) {
-        if (typeof target === 'string') {
-            this.targetEl = document.querySelector(target);
-            return;
-        }
         this.targetEl = target;
     }
 
     static createSVG(tagName, attributes = {}) {
         const svg = document.createElementNS('http://www.w3.org/2000/svg', tagName);
-        const $svg = new $el(svg);
-        return $svg.setAttributes(attributes);
+        return new $el(svg).setAttributes(attributes);
     }
 
     setAttributes(attributes = {}) {
-        Object.keys(attributes).forEach(attr => this.targetEl.setAttribute(attr, attributes[attr]));
+        Object.keys(attributes).forEach(attr =>
+            this.targetEl.setAttribute(attr, attributes[attr])
+        );
         return this;
     }
 
     animate(animate, stopPredicate = () => {}, onStop = () => {}) {
         this.animation = setInterval(()  => {
-            if (stopPredicate(this)) {
+            if (stopPredicate(this.targetEl)) {
                 this.stopAnimation();
-                onStop(this);
+                onStop(this.targetEl);
             }
-            animate(this);
+            animate(this.targetEl);
         }, 10);
     }
 

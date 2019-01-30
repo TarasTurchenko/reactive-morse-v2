@@ -37,6 +37,6 @@ const ALPHABET = {
     '-----': '0'
 };
 
-export function parseMorseCode(code) {
+export function translate(code) {
     return ALPHABET[code] || '[]'
 }

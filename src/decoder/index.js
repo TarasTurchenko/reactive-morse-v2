@@ -1,6 +1,6 @@
 import {BehaviorSubject, merge} from 'rxjs';
 import {SPAN} from '../consts';
-import {parseMorseCode} from './alpabet';
+import {translate} from './alpabet';
 import {map, distinctUntilChanged, filter, timestamp, buffer, tap} from 'rxjs/operators';
 import {getMorseEvent, getWhitespace, listenKeyboardEvent, timePeriod} from "./utils";
 
@@ -34,7 +34,7 @@ const letter$ = signal$.pipe(
     buffer(letterWhitespaces$),
     ignoreEmptyArray(),
     map(symbols => symbols.join('')),
-    map(parseMorseCode),
+    map(translate),
 );
 
 const wordWhitespaces$ = signalEnd$.pipe(

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <script src="./dist/bundle.js" defer></script>
+    <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body class="flex grid__column padding--lg">
 <svg class="width--full signals no-flex-resizable" xmlns="http://www.w3.org/2000/svg" data-morse-signals>
@@ -12,8 +13,14 @@
 </svg>
 <div class="flex grid__item--fit">
     <div class="flex grid__item--half grid__column">
-        <div data-word></div>
-        <div data-sentence></div>
+        <div>
+            Word:
+            <span data-word></span>
+        </div>
+        <div>
+            Sentence:
+            <span data-sentence></span>
+        </div>
     </div>
     <div class="flex grid__item--half">
         <img class="dashboard__image" src="images/morse-alphabet.png">
